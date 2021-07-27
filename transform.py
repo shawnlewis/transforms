@@ -108,8 +108,6 @@ def main():
     input_type = artifact.type
 
     transforms = Transforms(api, PROJECT)
-    print('HERE')
-    print(transforms._transforms)
     equivalents = transforms.get_equivalent_artifacts_of_type(
         args.input, args.target_type)
     if equivalents:
@@ -133,6 +131,9 @@ def main():
             queued_job = launch_add(
                 'https://wandb.ai/%s/runs/%s' % (PROJECT, run_id), {
                     "overrides": {
+                        "args": {
+                            "input": input
+                        },
                         "run_config": {
                             "input": input
                         }
