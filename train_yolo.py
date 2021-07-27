@@ -8,15 +8,20 @@ import wandb
 parser = argparse.ArgumentParser()
 parser.description = 'Train a model on a dataset'
 parser.add_argument('--input_dataset', type=str, required=True)
+parser.add_argument('--sweep_id', type=str)
 parser.add_argument('--input_model', type=str)
 parser.add_argument('--learning_rate', type=float, required=True)
 parser.add_argument('--momentum', type=float, required=True)
 
+INPUT_DATASET_TYPE = 'yolo-dataset'
+
 
 def main():
     args = parser.parse_args()
-    with wandb.init(config=args, job_type='train') as run:
+    with wandb.init(config=args, job_type='train-yolo') as run:
         artifact = run.use_artifact(run.config.input_dataset)
+        if artifact.type != INPUT_DATASET_TYPE:
+            raise 'input_artifact type must be: %s' % INPUT_DATASET_TYPE
         if args.input_model:
             run.use_artifact(args.input_model)
         # input_dir = artifact.download()

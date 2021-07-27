@@ -100,6 +100,7 @@ def print_path(transform_path):
 def main():
     args = parser.parse_args()
     api = wandb.Api()
+    run = wandb.init(config=args, job_type='transform')
     project = api.settings['entity'] + '/' + api.settings['project']
 
     artifact = api.artifact(args.input)
@@ -110,11 +111,13 @@ def main():
         args.input, args.target_type)
     if equivalents:
         print('Equivalent artifact available: %s' % equivalents[0])
+        run.summary['output'] = equivalents[0]
         sys.exit(0)
 
     paths = transforms.get_type_paths(input_type)
     paths_to_target = sorted(paths, key=lambda x: len(x))
     paths_to_target = [p for p in paths if p[-1][1] == args.target_type]
+    output = None
     if paths_to_target:
         # TODO: do transform
         print('Found %s paths to target' % len(paths_to_target))
@@ -142,6 +145,8 @@ def main():
             run.wait_until_finished()
             run.load(force=True)
             input = run.summary['output']
+        run.summary['output'] = input
+        sys.exit(0)
 
     else:
         available_types = [input_type] + list(set(p[-1][1] for p in paths))
@@ -153,6 +158,7 @@ def main():
         print('Please create and run a transform from one these types: %s' %
               available_types)
         print('  to the target type: %s' % args.target_type)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
