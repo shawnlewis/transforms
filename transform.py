@@ -142,7 +142,8 @@ def main():
             queued_job.wait_until_running()
             run = queued_job.run
             run.wait_until_finished()
-            input = input.split(':')[0] + '-' + output_type
+            run.load(force=True)
+            input = run.summary['output']
 
     else:
         available_types = [input_type] + list(set(p[-1][1] for p in paths))
