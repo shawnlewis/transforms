@@ -1,1 +1,1 @@
-git+git://github.com/wandb/client.git@feature/wandb-launch
+git+git://github.com/wandb/client.git@launch-programmatic-add-and-stats

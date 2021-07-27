@@ -12,9 +12,9 @@ parser.add_argument('--target_type', type=str, required=True)
 
 
 class Transforms(object):
-    def __init__(self, api, entity_project):
+    def __init__(self, api, project):
         # TODO: filter later
-        runs = api.runs(entity_project)
+        runs = api.runs(project)
         result = []
         for run in runs:
             input_artifact = None
@@ -97,17 +97,15 @@ def print_path(transform_path):
     print()
 
 
-PROJECT = 'shawn/launch-test2'
-
-
 def main():
     args = parser.parse_args()
     api = wandb.Api()
+    project = api.settings['entity'] + '/' + api.settings['project']
 
     artifact = api.artifact(args.input)
     input_type = artifact.type
 
-    transforms = Transforms(api, PROJECT)
+    transforms = Transforms(api, project)
     equivalents = transforms.get_equivalent_artifacts_of_type(
         args.input, args.target_type)
     if equivalents:
@@ -129,7 +127,7 @@ def main():
         for transform_run in shortest_path:
             input_type, output_type, run_id = transform_run
             queued_job = launch_add(
-                'https://wandb.ai/%s/runs/%s' % (PROJECT, run_id), {
+                'https://wandb.ai/%s/runs/%s' % (project, run_id), {
                     "overrides": {
                         "args": {
                             "input": input
