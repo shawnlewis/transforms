@@ -97,7 +97,7 @@ def print_path(transform_path):
     print()
 
 
-PROJECT = 'shawn/launch-test'
+PROJECT = 'shawn/launch-test2'
 
 
 def main():
@@ -108,6 +108,8 @@ def main():
     input_type = artifact.type
 
     transforms = Transforms(api, PROJECT)
+    print('HERE')
+    print(transforms._transforms)
     equivalents = transforms.get_equivalent_artifacts_of_type(
         args.input, args.target_type)
     if equivalents:
