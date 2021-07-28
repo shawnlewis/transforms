@@ -25,6 +25,9 @@ def main():
         if args.input_model:
             run.use_artifact(args.input_model)
         # input_dir = artifact.download()
+        for i in range(10):
+            wandb.log({'loss': i * i * args.learning_rate * random.random(),
+                      'dist': i * args.momentum * random.random()})
         with tempfile.TemporaryDirectory() as output_dir:
             open(os.path.join(output_dir, 'file.txt'),
                  'w').write('%s' % random.random())

@@ -2,6 +2,7 @@ import argparse
 import string
 import random
 import wandb
+import sys
 from launch import launch
 
 
@@ -21,15 +22,19 @@ def best_n_runs(runs, n):
 
 def main():
     args = parser.parse_args()
-    run = wandb.init(config=args, job_type='pbt_sweep')
     sweep_id = ''.join(random.choice(string.ascii_lowercase)
                        for i in range(9))
     print('sweep_id:', sweep_id)
+
+    args = vars(args)
+    args['controller_sweep_id'] = sweep_id
+    run = wandb.init(config=args, job_type='pbt_sweep')
 
     all_runs = []
     n = 0
     for gen in range(run.config.num_gens):
         print('Generation', gen)
+        sys.stdout.flush()
         best_n_runs = sorted(
             all_runs, key=lambda r: r.summary['acc'])[-run.config.best_n_models:]
         # launch a generation
@@ -38,14 +43,14 @@ def main():
             n += 1
             run_config = {
                 'sweep_id': sweep_id,
-                'input_dataset': args.input_dataset,
+                'input_dataset': run.config.input_dataset,
                 'learning_rate': random.random(),
                 'momentum': random.random()
             }
             if best_n_runs:
                 run_config['input_model'] = random.choice(
                     best_n_runs).summary['output']
-            jobs.append(launch(args.template_uri, run_config))
+            jobs.append(launch(run.config.template_uri, run_config))
         # wait for results
         all_runs += [j.get_result() for j in jobs]
         # log status
@@ -54,8 +59,7 @@ def main():
 
     top_run = sorted(
         all_runs, key=lambda r: r.summary['acc'])[-1]
-    run['output'] = top_run
-    run['sweep_id'] = sweep_id
+    run.summary['output'] = dict(top_run.summary)
 
 
 if __name__ == '__main__':

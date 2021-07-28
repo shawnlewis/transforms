@@ -10,6 +10,6 @@ wandb artifact put -t yolo-dataset -n $2/yolo-dataset1 yolo-dataset1
 cd ..
 
 python transform-coco-to-wandb.py --input=coco-dataset1:v0
-python transform.py --input=coco-dataset1:v1 --target_type=wandb
+python transform.py --input=coco-dataset1:v0 --target_type=wandb-dataset
 
-python train.py --input_dataset=yolo-dataset1 --learning_rate=0.1 --momentum=0.9
+python train_yolo.py --input_dataset=yolo-dataset1:v0 --learning_rate=0.1 --momentum=0.9
